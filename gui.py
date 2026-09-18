@@ -54,7 +54,7 @@ FONT_FAMILY = "Segoe UI"
 class WeatherApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Weather App — لوحة طقس شخصية")
+        self.title("Weather App")
         self.geometry("620x620")
         self.resizable(False, False)
         self.configure(bg=BG_MAIN)
@@ -125,8 +125,8 @@ class WeatherApp(tk.Tk):
     def _build_header(self):
         header = ttk.Frame(self, padding=(20, 18, 20, 10))
         header.pack(fill="x")
-        ttk.Label(header, text="🌦️  لوحة طقس شخصية", style="Header.TLabel").pack(anchor="w")
-        ttk.Label(header, text="ابحث عن أي مدينة لعرض حالة الطقس الحالية والتوقعات",
+        ttk.Label(header, text="🌦️  Personal Weather Dashboard", style="Header.TLabel").pack(anchor="w")
+        ttk.Label(header, text="Search for any city to view the current weather and forecast",
                   style="TLabel", foreground=TEXT_MUTED).pack(anchor="w", pady=(2, 0))
 
     def _build_search_bar(self):
@@ -136,7 +136,7 @@ class WeatherApp(tk.Tk):
         self.city_entry = ttk.Entry(frame, width=26, font=(FONT_FAMILY, 11))
         self.city_entry.pack(side="left", ipady=3)
         self.city_entry.bind("<Return>", lambda event: self.on_search())
-        self.city_entry.insert(0, "اكتب اسم المدينة...")
+        self.city_entry.insert(0, "Enter city name...")
         self.city_entry.bind("<FocusIn>", self._clear_placeholder)
 
         unit_frame = ttk.Frame(frame)
@@ -150,7 +150,7 @@ class WeatherApp(tk.Tk):
                    command=self.on_search).pack(side="left", padx=8)
 
     def _clear_placeholder(self, event):
-        if self.city_entry.get() == "اكتب اسم المدينة...":
+        if self.city_entry.get() == "Enter city name...":
             self.city_entry.delete(0, tk.END)
 
     def _build_result_card(self):
@@ -169,11 +169,11 @@ class WeatherApp(tk.Tk):
         info_col = ttk.Frame(top_row, style="Card.TFrame")
         info_col.pack(side="left", fill="both", expand=True)
 
-        self.city_label = ttk.Label(info_col, text="لا توجد بيانات بعد",
+        self.city_label = ttk.Label(info_col, text="No data yet",
                                      style="Card.TLabel", font=(FONT_FAMILY, 13, "bold"))
         self.city_label.pack(anchor="w")
 
-        self.condition_label = ttk.Label(info_col, text="ابحث عن مدينة للبدء",
+        self.condition_label = ttk.Label(info_col, text="Search for a city to begin",
                                           style="Muted.TLabel")
         self.condition_label.pack(anchor="w")
 
@@ -233,25 +233,25 @@ class WeatherApp(tk.Tk):
         city = self.city_entry.get().strip()
 
         if not validate_city_name(city):
-            messagebox.showerror("خطأ", "الرجاء إدخال اسم مدينة صحيح.")
+            messagebox.showerror("Error", "Please enter a valid city name.")
             return
 
         try:
             weather = get_weather(city)
         except CityNotFoundError as e:
-            messagebox.showerror("لم يتم العثور على المدينة", str(e))
+            messagebox.showerror("City not found", str(e))
             return
         except NetworkError as e:
-            messagebox.showerror("مشكلة اتصال", str(e))
+            messagebox.showerror("Connection problem", str(e))
             return
         except APITimeoutError as e:
-            messagebox.showerror("انتهت المهلة", str(e))
+            messagebox.showerror("Request timed out", str(e))
             return
         except InvalidAPIResponseError as e:
-            messagebox.showerror("رد غير متوقع", str(e))
+            messagebox.showerror("Unexpected response", str(e))
             return
         except WeatherAPIError as e:
-            messagebox.showerror("خطأ", str(e))
+            messagebox.showerror("Error", str(e))
             return
 
         self.current_city_var.set(weather["city"])
@@ -268,7 +268,7 @@ class WeatherApp(tk.Tk):
     def on_add_favorite(self):
         city = self.current_city_var.get()
         if not city:
-            messagebox.showinfo("تنبيه", "ابحث عن مدينة أولاً قبل إضافتها للمفضلة.")
+            messagebox.showinfo("Notice", "Search for a city before adding it to favorites.")
             return
         add_favorite(city)
         self._refresh_favorites()
@@ -303,29 +303,29 @@ class WeatherApp(tk.Tk):
     def on_show_forecast(self):
         city = self.current_city_var.get()
         if not city:
-            messagebox.showinfo("تنبيه", "ابحث عن مدينة أولاً قبل عرض التوقعات.")
+            messagebox.showinfo("Notice", "Search for a city before viewing the forecast.")
             return
 
         try:
             forecast = get_forecast(city)
         except CityNotFoundError as e:
-            messagebox.showerror("لم يتم العثور على المدينة", str(e))
+            messagebox.showerror("City not found", str(e))
             return
         except NetworkError as e:
-            messagebox.showerror("مشكلة اتصال", str(e))
+            messagebox.showerror("Connection problem", str(e))
             return
         except APITimeoutError as e:
-            messagebox.showerror("انتهت المهلة", str(e))
+            messagebox.showerror("Request timed out", str(e))
             return
         except InvalidAPIResponseError as e:
-            messagebox.showerror("رد غير متوقع", str(e))
+            messagebox.showerror("Unexpected response", str(e))
             return
         except WeatherAPIError as e:
-            messagebox.showerror("خطأ", str(e))
+            messagebox.showerror("Error", str(e))
             return
 
         if not forecast:
-            messagebox.showinfo("تنبيه", "لا توجد بيانات توقعات متاحة لهذه المدينة.")
+            messagebox.showinfo("Notice", "No forecast data is available for this city.")
             return
 
         self._open_forecast_window(city, forecast)
@@ -342,7 +342,7 @@ class WeatherApp(tk.Tk):
         unit = self.unit_var.get()
         symbol = "°F" if unit == "F" else "°C"
 
-        ttk.Label(window, text=f"📅 توقعات 5 أيام — {city}",
+        ttk.Label(window, text=f"📅 5-Day Forecast — {city}",
                   style="Header.TLabel", font=(FONT_FAMILY, 13, "bold")).pack(
             anchor="w", padx=14, pady=(14, 8))
 
@@ -367,7 +367,7 @@ class WeatherApp(tk.Tk):
                                              f"{emoji} {day['description'].title()}"))
 
         # Bonus: ASCII chart of the same data
-        ttk.Label(window, text="📊 الرسم البياني (ASCII):", style="TLabel",
+        ttk.Label(window, text="📊 ASCII chart:", style="TLabel",
                   font=(FONT_FAMILY, 10, "bold")).pack(anchor="w", padx=14)
 
         chart_text = generate_ascii_chart(

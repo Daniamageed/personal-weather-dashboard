@@ -14,6 +14,9 @@ Covers:
 import os
 import tempfile
 
+import pytest
+
+from api_client import get_api_key, WeatherAPIError
 from project import (
     celsius_to_fahrenheit,
     fahrenheit_to_celsius,
@@ -111,6 +114,12 @@ def test_get_weather_emoji():
     assert get_weather_emoji("light rain") == "🌧️"
     assert get_weather_emoji("heavy snow") == "❄️"
     assert get_weather_emoji("something unknown") == "🌡️"
+
+
+def test_get_api_key_error_message_is_english(monkeypatch):
+    monkeypatch.delenv("WEATHER_API_KEY", raising=False)
+    with pytest.raises(WeatherAPIError, match="WEATHER_API_KEY was not found"):
+        get_api_key()
 
 
 # 7. Bonus: ASCII chart generation ------------------------------------------

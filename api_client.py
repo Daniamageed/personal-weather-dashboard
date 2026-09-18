@@ -50,7 +50,7 @@ def get_api_key() -> str:
     api_key = os.getenv("WEATHER_API_KEY")
     if not api_key:
         raise WeatherAPIError(
-            "لم يتم العثور على WEATHER_API_KEY. تأكد من إضافته في ملف .env"
+            "WEATHER_API_KEY was not found. Make sure to add it to the .env file."
         )
     return api_key
 
@@ -81,20 +81,20 @@ def get_weather(city: str, api_key: str | None = None) -> dict:
     try:
         response = requests.get(BASE_URL, params=params, timeout=REQUEST_TIMEOUT)
     except requests.exceptions.Timeout:
-        raise APITimeoutError(f"انتهت مهلة الاتصال أثناء البحث عن '{city}'.")
+        raise APITimeoutError(f"The connection timed out while searching for '{city}'.")
     except requests.exceptions.ConnectionError:
-        raise NetworkError("تعذّر الاتصال بالإنترنت. تحقق من اتصالك وحاول مجددًا.")
+        raise NetworkError("The internet connection could not be established. Check your connection and try again.")
     except requests.exceptions.RequestException as e:
-        raise WeatherAPIError(f"حدث خطأ غير متوقع أثناء الاتصال بالـ API: {e}")
+        raise WeatherAPIError(f"An unexpected error occurred while calling the API: {e}")
 
     if response.status_code == 404:
-        raise CityNotFoundError(f"لم يتم العثور على مدينة باسم '{city}'.")
+        raise CityNotFoundError(f"No city named '{city}' was found.")
 
     if response.status_code == 401:
-        raise WeatherAPIError("مفتاح الـ API غير صالح أو غير مفعّل بعد.")
+        raise WeatherAPIError("The API key is invalid or not activated yet.")
 
     if response.status_code != 200:
-        raise WeatherAPIError(f"استجابة غير متوقعة من الخادم (كود {response.status_code}).")
+        raise WeatherAPIError(f"Unexpected response from the server (status code {response.status_code}).")
 
     try:
         data = response.json()
@@ -107,7 +107,7 @@ def get_weather(city: str, api_key: str | None = None) -> dict:
             "description": data["weather"][0]["description"],
         }
     except (KeyError, IndexError, ValueError) as e:
-        raise InvalidAPIResponseError(f"رد الـ API غير مفهوم أو ناقص: {e}")
+        raise InvalidAPIResponseError(f"The API response was incomplete or not understood: {e}")
 
 
 def get_forecast(city: str, api_key: str | None = None) -> list:
@@ -134,24 +134,24 @@ def get_forecast(city: str, api_key: str | None = None) -> list:
     try:
         response = requests.get(FORECAST_URL, params=params, timeout=REQUEST_TIMEOUT)
     except requests.exceptions.Timeout:
-        raise APITimeoutError(f"انتهت مهلة الاتصال أثناء جلب توقعات '{city}'.")
+        raise APITimeoutError(f"The connection timed out while fetching the forecast for '{city}'.")
     except requests.exceptions.ConnectionError:
-        raise NetworkError("تعذّر الاتصال بالإنترنت. تحقق من اتصالك وحاول مجددًا.")
+        raise NetworkError("The internet connection could not be established. Check your connection and try again.")
     except requests.exceptions.RequestException as e:
-        raise WeatherAPIError(f"حدث خطأ غير متوقع أثناء الاتصال بالـ API: {e}")
+        raise WeatherAPIError(f"An unexpected error occurred while calling the API: {e}")
 
     if response.status_code == 404:
-        raise CityNotFoundError(f"لم يتم العثور على مدينة باسم '{city}'.")
+        raise CityNotFoundError(f"No city named '{city}' was found.")
     if response.status_code == 401:
-        raise WeatherAPIError("مفتاح الـ API غير صالح أو غير مفعّل بعد.")
+        raise WeatherAPIError("The API key is invalid or not activated yet.")
     if response.status_code != 200:
-        raise WeatherAPIError(f"استجابة غير متوقعة من الخادم (كود {response.status_code}).")
+        raise WeatherAPIError(f"Unexpected response from the server (status code {response.status_code}).")
 
     try:
         data = response.json()
         entries = data["list"]
     except (KeyError, ValueError) as e:
-        raise InvalidAPIResponseError(f"رد الـ API غير مفهوم أو ناقص: {e}")
+        raise InvalidAPIResponseError(f"The API response was incomplete or not understood: {e}")
 
     return _reduce_to_daily(entries)
 
