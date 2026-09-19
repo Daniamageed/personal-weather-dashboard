@@ -1,4 +1,4 @@
-# 🌦️ Weather App — Personal Weather Dashboard
+﻿# 🌦️ Weather App — Personal Weather Dashboard
 
 #### Video Demo: <https://youtu.be/HMwFgB3joEI?si=9yVJo80ipSLHrIMW>
 
@@ -207,5 +207,7 @@ flowchart TD
 
 ## 🔗 Links
 
-- **GitHub Repository:** <https://github.com/Daniamageed> *(https://github.com/Daniamageed/personal-weather-dashboard.git)*
+- **GitHub Repository:** <https://github.com/Daniamageed> *(replace with
+  the exact repository URL once created)*
 - **Demo Video:** <https://youtu.be/HMwFgB3joEI?si=9yVJo80ipSLHrIMW>
+

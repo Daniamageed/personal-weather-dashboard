@@ -1,4 +1,4 @@
-"""
+﻿"""
 api_client.py
 -------------
 Unit responsible for: talking to the OpenWeatherMap "current weather"
@@ -9,15 +9,8 @@ never hard-coded or pushed to GitHub.
 """
 
 import os
-
 import requests
-
-try:
-    from dotenv import load_dotenv
-except ImportError:  # pragma: no cover - optional dependency fallback
-    def load_dotenv(*args, **kwargs):
-        return False
-
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -50,7 +43,7 @@ def get_api_key() -> str:
     api_key = os.getenv("WEATHER_API_KEY")
     if not api_key:
         raise WeatherAPIError(
-            "WEATHER_API_KEY was not found. Make sure to add it to the .env file."
+            "WEATHER_API_KEY not found. Make sure it is set in your .env file."
         )
     return api_key
 
@@ -81,11 +74,11 @@ def get_weather(city: str, api_key: str | None = None) -> dict:
     try:
         response = requests.get(BASE_URL, params=params, timeout=REQUEST_TIMEOUT)
     except requests.exceptions.Timeout:
-        raise APITimeoutError(f"The connection timed out while searching for '{city}'.")
+        raise APITimeoutError(f"The request timed out while searching for '{city}'.")
     except requests.exceptions.ConnectionError:
-        raise NetworkError("The internet connection could not be established. Check your connection and try again.")
+        raise NetworkError("Could not connect to the internet. Check your connection and try again.")
     except requests.exceptions.RequestException as e:
-        raise WeatherAPIError(f"An unexpected error occurred while calling the API: {e}")
+        raise WeatherAPIError(f"An unexpected error occurred while contacting the API: {e}")
 
     if response.status_code == 404:
         raise CityNotFoundError(f"No city named '{city}' was found.")
@@ -107,7 +100,7 @@ def get_weather(city: str, api_key: str | None = None) -> dict:
             "description": data["weather"][0]["description"],
         }
     except (KeyError, IndexError, ValueError) as e:
-        raise InvalidAPIResponseError(f"The API response was incomplete or not understood: {e}")
+        raise InvalidAPIResponseError(f"The API response was invalid or incomplete: {e}")
 
 
 def get_forecast(city: str, api_key: str | None = None) -> list:
@@ -134,11 +127,11 @@ def get_forecast(city: str, api_key: str | None = None) -> list:
     try:
         response = requests.get(FORECAST_URL, params=params, timeout=REQUEST_TIMEOUT)
     except requests.exceptions.Timeout:
-        raise APITimeoutError(f"The connection timed out while fetching the forecast for '{city}'.")
+        raise APITimeoutError(f"The request timed out while fetching the forecast for '{city}'.")
     except requests.exceptions.ConnectionError:
-        raise NetworkError("The internet connection could not be established. Check your connection and try again.")
+        raise NetworkError("Could not connect to the internet. Check your connection and try again.")
     except requests.exceptions.RequestException as e:
-        raise WeatherAPIError(f"An unexpected error occurred while calling the API: {e}")
+        raise WeatherAPIError(f"An unexpected error occurred while contacting the API: {e}")
 
     if response.status_code == 404:
         raise CityNotFoundError(f"No city named '{city}' was found.")
@@ -151,7 +144,7 @@ def get_forecast(city: str, api_key: str | None = None) -> list:
         data = response.json()
         entries = data["list"]
     except (KeyError, ValueError) as e:
-        raise InvalidAPIResponseError(f"The API response was incomplete or not understood: {e}")
+        raise InvalidAPIResponseError(f"The API response was invalid or incomplete: {e}")
 
     return _reduce_to_daily(entries)
 
@@ -181,3 +174,4 @@ def _reduce_to_daily(entries: list) -> list:
     for d in daily:
         d.pop("_hour_diff", None)
     return daily[:5]
+

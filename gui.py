@@ -1,4 +1,4 @@
-"""
+﻿"""
 gui.py
 ------
 Tkinter interface for the Weather App — styled to look like a real
@@ -16,14 +16,12 @@ Layout:
 import tkinter as tk
 from tkinter import ttk, messagebox
 
-from formatting import (
+from project import (
     validate_city_name,
     calculate_comfort_score,
     celsius_to_fahrenheit,
     get_weather_emoji,
     generate_ascii_chart,
-)
-from storage import (
     add_favorite,
     remove_favorite,
     list_favorites,
@@ -54,7 +52,7 @@ FONT_FAMILY = "Segoe UI"
 class WeatherApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Weather App")
+        self.title("Weather App — Personal Weather Dashboard")
         self.geometry("620x620")
         self.resizable(False, False)
         self.configure(bg=BG_MAIN)
@@ -126,7 +124,7 @@ class WeatherApp(tk.Tk):
         header = ttk.Frame(self, padding=(20, 18, 20, 10))
         header.pack(fill="x")
         ttk.Label(header, text="🌦️  Personal Weather Dashboard", style="Header.TLabel").pack(anchor="w")
-        ttk.Label(header, text="Search for any city to view the current weather and forecast",
+        ttk.Label(header, text="Search any city to see current weather and forecast",
                   style="TLabel", foreground=TEXT_MUTED).pack(anchor="w", pady=(2, 0))
 
     def _build_search_bar(self):
@@ -173,7 +171,7 @@ class WeatherApp(tk.Tk):
                                      style="Card.TLabel", font=(FONT_FAMILY, 13, "bold"))
         self.city_label.pack(anchor="w")
 
-        self.condition_label = ttk.Label(info_col, text="Search for a city to begin",
+        self.condition_label = ttk.Label(info_col, text="Search a city to get started",
                                           style="Muted.TLabel")
         self.condition_label.pack(anchor="w")
 
@@ -239,16 +237,16 @@ class WeatherApp(tk.Tk):
         try:
             weather = get_weather(city)
         except CityNotFoundError as e:
-            messagebox.showerror("City not found", str(e))
+            messagebox.showerror("City Not Found", str(e))
             return
         except NetworkError as e:
-            messagebox.showerror("Connection problem", str(e))
+            messagebox.showerror("Connection Error", str(e))
             return
         except APITimeoutError as e:
-            messagebox.showerror("Request timed out", str(e))
+            messagebox.showerror("Request Timed Out", str(e))
             return
         except InvalidAPIResponseError as e:
-            messagebox.showerror("Unexpected response", str(e))
+            messagebox.showerror("Unexpected Response", str(e))
             return
         except WeatherAPIError as e:
             messagebox.showerror("Error", str(e))
@@ -268,7 +266,7 @@ class WeatherApp(tk.Tk):
     def on_add_favorite(self):
         city = self.current_city_var.get()
         if not city:
-            messagebox.showinfo("Notice", "Search for a city before adding it to favorites.")
+            messagebox.showinfo("Notice", "Please search for a city before adding it to favorites.")
             return
         add_favorite(city)
         self._refresh_favorites()
@@ -303,29 +301,29 @@ class WeatherApp(tk.Tk):
     def on_show_forecast(self):
         city = self.current_city_var.get()
         if not city:
-            messagebox.showinfo("Notice", "Search for a city before viewing the forecast.")
+            messagebox.showinfo("Notice", "Please search for a city before viewing the forecast.")
             return
 
         try:
             forecast = get_forecast(city)
         except CityNotFoundError as e:
-            messagebox.showerror("City not found", str(e))
+            messagebox.showerror("City Not Found", str(e))
             return
         except NetworkError as e:
-            messagebox.showerror("Connection problem", str(e))
+            messagebox.showerror("Connection Error", str(e))
             return
         except APITimeoutError as e:
-            messagebox.showerror("Request timed out", str(e))
+            messagebox.showerror("Request Timed Out", str(e))
             return
         except InvalidAPIResponseError as e:
-            messagebox.showerror("Unexpected response", str(e))
+            messagebox.showerror("Unexpected Response", str(e))
             return
         except WeatherAPIError as e:
             messagebox.showerror("Error", str(e))
             return
 
         if not forecast:
-            messagebox.showinfo("Notice", "No forecast data is available for this city.")
+            messagebox.showinfo("Notice", "No forecast data available for this city.")
             return
 
         self._open_forecast_window(city, forecast)
@@ -367,7 +365,7 @@ class WeatherApp(tk.Tk):
                                              f"{emoji} {day['description'].title()}"))
 
         # Bonus: ASCII chart of the same data
-        ttk.Label(window, text="📊 ASCII chart:", style="TLabel",
+        ttk.Label(window, text="📊 Temperature Chart (ASCII):", style="TLabel",
                   font=(FONT_FAMILY, 10, "bold")).pack(anchor="w", padx=14)
 
         chart_text = generate_ascii_chart(
@@ -426,3 +424,4 @@ def run_app():
 
 if __name__ == "__main__":
     run_app()
+
